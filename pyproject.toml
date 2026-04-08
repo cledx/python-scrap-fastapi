@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-scrap-fastapi"
+version = "0.1.0"
+description = "FastAPI job scraper backend for Tokyo job listings."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "sqlmodel",
+  "httpx",
+  "apscheduler",
+  "python-dotenv",
+  "uvicorn[standard]",
+]
