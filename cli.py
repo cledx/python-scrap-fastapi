@@ -9,6 +9,7 @@ from dataclasses import asdict
 
 from scraper.daijob import DAIJOB_JOBS_URL, scrape_daijob_jobs
 from scraper.gaijinpot import GAIJINPOT_JOBS_URL, scrape_gaijinpot_jobs
+from scraper.tokyodev import TOKYODEV_JOBS_URL, scrape_tokyodev
 
 
 async def _run_gaijinpot(url: str, timeout: float) -> int:
@@ -20,6 +21,12 @@ async def _run_gaijinpot(url: str, timeout: float) -> int:
 async def _run_daijob(url: str, timeout: float) -> int:
     listings = await scrape_daijob_jobs(url=url, timeout_seconds=timeout)
     print(json.dumps([asdict(job) for job in listings], indent=2, ensure_ascii=False))
+    return 0
+
+
+async def _run_tokyodev(url: str, timeout: float) -> int:
+    listings = await scrape_tokyodev(url=url, timeout_seconds=timeout)
+    print(json.dumps(listings, indent=2, ensure_ascii=False))
     return 0
 
 
@@ -45,6 +52,14 @@ def main() -> int:
         default=20.0,
         help="Request timeout in seconds",
     )
+    tokyodev_parser = subparsers.add_parser("tokyodev", help="Scrape TokyoDev and print JSON results")
+    tokyodev_parser.add_argument("--url", default=None, help="Override TokyoDev source URL")
+    tokyodev_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=20.0,
+        help="Request timeout in seconds",
+    )
 
     args = parser.parse_args()
 
@@ -54,6 +69,9 @@ def main() -> int:
     if args.command == "daijob":
         url = args.url or DAIJOB_JOBS_URL
         return asyncio.run(_run_daijob(url=url, timeout=args.timeout))
+    if args.command == "tokyodev":
+        url = args.url or TOKYODEV_JOBS_URL
+        return asyncio.run(_run_tokyodev(url=url, timeout=args.timeout))
 
     parser.error(f"Unsupported command: {args.command}")
     return 2
