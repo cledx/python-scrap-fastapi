@@ -17,5 +17,9 @@ dependencies = [
   "uvicorn[standard]",
 ]
 
+[project.scripts]
+python-scrap-fastapi = "cli:main"
+
 [tool.setuptools]
 packages = ["api", "models", "scraper", "scheduler"]
+py-modules = ["cli"]
