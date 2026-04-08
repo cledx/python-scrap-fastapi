@@ -11,7 +11,11 @@ dependencies = [
   "fastapi",
   "sqlmodel",
   "httpx",
+  "beautifulsoup4",
   "apscheduler",
   "python-dotenv",
   "uvicorn[standard]",
 ]
+
+[tool.setuptools]
+packages = ["api", "models", "scraper", "scheduler"]

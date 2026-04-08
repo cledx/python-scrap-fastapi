@@ -3,7 +3,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-# Load .env values into environment variables at startup.
+# Load .env values into environment variables at startup
 load_dotenv()
 
 app = FastAPI(title="Python Job Scraper API")
