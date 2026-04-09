@@ -1,4 +1,4 @@
-"""Job listing row stored in the database."""
+"""Job listing SQLModel models and API schemas."""
 
 from datetime import datetime
 from typing import Optional
@@ -6,19 +6,31 @@ from typing import Optional
 from sqlmodel import Field, SQLModel
 
 
-class JobListing(SQLModel, table=True):
-    """A scraped job posting and optional AI-enriched fields."""
+class JobListingBase(SQLModel):
+    """Fields shared across DB and API job listing models."""
 
-    id: Optional[int] = Field(default=None, primary_key=True)
     title: str
     company: str
     location: str
     url: str
-    url_hash: str = Field(unique=True)
     description_snippet: str
     summary: Optional[str] = None
     pros: Optional[str] = None
     cons: Optional[str] = None
-    seen: bool = Field(default=False)
+    seen: bool = False
     posted_at: Optional[datetime] = None
+
+
+class JobListing(JobListingBase, table=True):
+    """Database table model for a scraped job posting."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    url_hash: str = Field(unique=True)
     scraped_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class JobListingResponse(JobListingBase):
+    """API response schema for a job listing."""
+
+    id: int
+    scraped_at: datetime
