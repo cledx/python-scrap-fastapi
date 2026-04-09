@@ -10,6 +10,7 @@ from dataclasses import asdict
 from scraper.daijob import DAIJOB_JOBS_URL, scrape_daijob_jobs
 from scraper.gaijinpot import GAIJINPOT_JOBS_URL, scrape_gaijinpot_jobs
 from scraper.tokyodev import TOKYODEV_JOBS_URL, scrape_tokyodev
+from scraper.wantedly import WANTEDLY_TOKYO_PROJECTS_URL, scrape_wantedly
 
 
 async def _run_gaijinpot(url: str, timeout: float) -> int:
@@ -26,6 +27,12 @@ async def _run_daijob(url: str, timeout: float) -> int:
 
 async def _run_tokyodev(url: str, timeout: float) -> int:
     listings = await scrape_tokyodev(url=url, timeout_seconds=timeout)
+    print(json.dumps(listings, indent=2, ensure_ascii=False))
+    return 0
+
+
+async def _run_wantedly(url: str, timeout: float) -> int:
+    listings = await scrape_wantedly(url=url, timeout_seconds=timeout)
     print(json.dumps(listings, indent=2, ensure_ascii=False))
     return 0
 
@@ -60,6 +67,14 @@ def main() -> int:
         default=20.0,
         help="Request timeout in seconds",
     )
+    wantedly_parser = subparsers.add_parser("wantedly", help="Scrape Wantedly and print JSON results")
+    wantedly_parser.add_argument("--url", default=None, help="Override Wantedly projects listing URL")
+    wantedly_parser.add_argument(
+        "--timeout",
+        type=float,
+        default=30.0,
+        help="Request timeout in seconds",
+    )
 
     args = parser.parse_args()
 
@@ -72,6 +87,9 @@ def main() -> int:
     if args.command == "tokyodev":
         url = args.url or TOKYODEV_JOBS_URL
         return asyncio.run(_run_tokyodev(url=url, timeout=args.timeout))
+    if args.command == "wantedly":
+        url = args.url or WANTEDLY_TOKYO_PROJECTS_URL
+        return asyncio.run(_run_wantedly(url=url, timeout=args.timeout))
 
     parser.error(f"Unsupported command: {args.command}")
     return 2
