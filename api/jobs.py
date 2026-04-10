@@ -66,3 +66,21 @@ def get_job_detail(
         cons=_parse_json_list(job.cons),
         description_snippet=job.description_snippet,
     )
+
+
+@router.patch("/jobs/{job_id}/seen", response_model=JobListingResponse)
+def mark_job_seen(
+    job_id: int,
+    session: Session = Depends(get_session),
+) -> JobListingResponse:
+    """Mark a job listing as seen."""
+
+    job = session.get(JobListing, job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    job.seen = True
+    session.add(job)
+    session.commit()
+    session.refresh(job)
+    return job
