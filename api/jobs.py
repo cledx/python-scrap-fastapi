@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 
 from models.database import get_session
@@ -29,3 +29,19 @@ def list_jobs(
 
     statement = statement.offset(offset).limit(limit)
     return list(session.exec(statement))
+
+
+@router.patch("/jobs/{job_id}/seen", response_model=JobListingResponse)
+def mark_job_seen(job_id: int, session: Session = Depends(get_session)) -> JobListingResponse:
+    """Mark a job listing as seen."""
+
+    statement = select(JobListing).where(JobListing.id == job_id)
+    listing = session.exec(statement).first()
+    if listing is None:
+        raise HTTPException(status_code=404, detail="Job listing not found")
+
+    listing.seen = True
+    session.add(listing)
+    session.commit()
+    session.refresh(listing)
+    return listing
