@@ -115,7 +115,14 @@ async def scrape_enrich_and_persist_listings() -> dict[str, int]:
     return stats
 
 
+async def run_daily_scrape() -> None:
+    """APScheduler job entrypoint for the daily scrape run."""
+    logger.info("Starting scheduled daily scrape run")
+    await scrape_enrich_and_persist_listings()
+
+
 __all__ = [
+    "run_daily_scrape",
     "scrape_daijob_jobs",
     "scrape_gaijinpot_jobs",
     "scrape_tokyodev",
