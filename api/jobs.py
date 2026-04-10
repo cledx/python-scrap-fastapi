@@ -45,6 +45,20 @@ def list_jobs(
     return list(session.exec(statement))
 
 
+@router.patch("/jobs/{job_id}/seen", response_model=JobListingResponse)
+def mark_job_seen(job_id: int, session: Session = Depends(get_session)) -> JobListingResponse:
+    """Mark a job listing as seen."""
+
+    statement = select(JobListing).where(JobListing.id == job_id)
+    listing = session.exec(statement).first()
+    if listing is None:
+        raise HTTPException(status_code=404, detail="Job listing not found")
+
+    listing.seen = True
+    session.add(listing)
+    session.commit()
+    session.refresh(listing)
+    return listing
 @router.get("/jobs/{job_id}", response_model=JobListingDetail)
 def get_job_detail(
     job_id: int,
